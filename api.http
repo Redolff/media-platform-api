@@ -100,7 +100,7 @@ POST http://localhost:3000/auth/logout
 GET http://localhost:3000/profiles/68ed68ac8d0e440b2817d900
 
 ### Obtener el PERFIL por ID de un USUARIO
-GET http://localhost:3000/profiles/68ed68ac8d0e440b2817d900/68f9c963ad666c830f7519f4
+GET http://localhost:3000/profiles/68ed68ac8d0e440b2817d900/68fb0c7709fbb24140111bc3
 
 ### Crear un PERFIL de un USUARIO
 POST http://localhost:3000/profiles/68ed68ac8d0e440b2817d900
@@ -114,14 +114,15 @@ Content-Type: application/json
 ### Eliminar un PROFILE de un USUARIO
 DELETE http://localhost:3000/profiles/userID/profileID
 
-### Agregar un ITEM a MYLIST a un PROFILE de un USUARIO
-PATCH http://localhost:3000/profiles/68ed68ac8d0e440b2817d900
+### EDITAR (AGREGAR o ELIMINAR) un ITEM a MYLIST a un PROFILE de un USUARIO
+PATCH http://localhost:3000/profiles/myList/68ed68ac8d0e440b2817d900
 Content-Type: application/json
 
 {
     "profileId": "68fb0c7709fbb24140111bc3",
     "category": "movies",
     "item": {
+        "_id": "68895e42f3975a4ba7c0ea71",
         "title": "El sicario",
         "year": 2025,
         "director": "Frank Redolfo",

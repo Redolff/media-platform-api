@@ -42,31 +42,44 @@ export class ProfileModel {
         const db = await connect()
         const users = db.collection('users')
 
+        if (!userId || !profileId) throw new Error("Missing user or profile ID")
+        if (!category || !item) throw new Error("Missing category or item")
+
         const objectId = new ObjectId(userId)
         const profileObjectId = new ObjectId(profileId)
 
         const user = await users.findOne({ _id: objectId })
-        if (!user) throw new Error('User not found')
+        if (!user) throw new Error("User not found")
 
-        if (!user.profiles || !Array.isArray(user.profiles)) {
-            throw new Error('User has not profiles')
+        const profile = user.profiles?.find((p) => p._id.toString() === profileObjectId.toString())
+        if (!profile) throw new Error("Profile not found")
+
+        if (!profile.myList || !profile.myList[category]) {
+            throw new Error("Invalid category in myList")
         }
 
-        const profile = user.profiles.find(p => p._id.toString() === profileObjectId.toString())
-        console.log('found profile:', profile)
+        const exists = profile.myList[category].some(
+            (i) => i._id?.toString() === item._id?.toString()
+        )
 
-        const existsItem = profile.myList[category]?.some(exist => exist._id.toString() === item._id.toString())
-        if (existsItem) throw new Error('Item already exists in my list')
+        const updateOperation = exists
+            ? { $pull: { [`profiles.$.myList.${category}`]: { _id: item._id } } }
+            : { $push: { [`profiles.$.myList.${category}`]: item } }
 
         const result = await users.updateOne(
             { _id: objectId, "profiles._id": profileObjectId },
-            { $push: { [`profiles.$.myList.${category}`]: item } }
+            updateOperation
         )
 
-        if (result.modifiedCount === 0) throw new Error('Failed to add item')
+        if (result.modifiedCount === 0) {
+            throw new Error("Failed to update myList")
+        }
 
         const updatedUser = await users.findOne({ _id: objectId })
-        const updatedProfile = updatedUser.profiles.find(p => p._id.toString() === profileObjectId.toString())
+        const updatedProfile = updatedUser.profiles.find(
+            (p) => p._id.toString() === profileObjectId.toString()
+        )
+
         return updatedProfile
     }
 

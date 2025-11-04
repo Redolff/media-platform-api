@@ -8,7 +8,7 @@ export const profileRouter = ({ profileModel }) => {
 
     profileRouter.get('/:userId', profileController.getAll)
     profileRouter.post('/:userId', profileController.create)
-    profileRouter.patch('/:userId', profileController.update)
+    profileRouter.patch('/myList/:userId', profileController.update)
 
     profileRouter.get('/:userId/:profileId', profileController.getById)
     profileRouter.delete('/:userId/:profileId', profileController.delete)

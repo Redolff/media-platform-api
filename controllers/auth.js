@@ -41,6 +41,50 @@ export class AuthController {
         }
     }
 
+    static loginGoogle = async (req, res) => {
+        const { email, firstName, lastName, avatar } = req.body
+        const db = await connect()
+        const users = db.collection('users')
+
+        if(!email) return res.status(400).json({ message: 'Email is required' })
+
+        try {
+            let user = await users.findOne({ email })
+            if(!user) {
+                const newUser = {
+                    firstName,
+                    lastName,
+                    email,
+                    avatar,
+                    role: 'user',
+                    provider: 'google',
+                    profiles: []
+                }
+                const result = await users.insertOne(newUser)
+                user = { _id: result.insertedId, ...newUser }
+            }
+
+            const token = jwt.sign(
+                { id: user._id, email: user.email },
+                process.env.SECRET_JWT_KEY,
+                { expiresIn: '1h' }
+            )
+
+            res.cookie('access_token', token, {
+                httpOnly: true,
+                secure: process.env.NODE_ENV === 'production',
+                sameSite: 'strict',
+                maxAge: 1000 * 60 * 60
+            })
+
+            const { password, ...safeUser } = user
+            return res.status(200).json({ message: 'Login exitoso con Google', user: safeUser, token })
+        } catch(error) {
+            console.error('Error en el login Google: ', error)
+            return res.status(500).json({ message: 'Error interno en el servidor' })
+        }
+    }
+
     static register = async (req, res) => {
         const db = await connect()
         const users = db.collection('users')
@@ -50,7 +94,6 @@ export class AuthController {
         if(existingUser) return res.status(409).json({ message: 'El mail ya está registrado' })
         
         try {
-
             const newUser = await UserModel.create({
                 ...result.data,
                 role: 'user'

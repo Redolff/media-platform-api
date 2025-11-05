@@ -8,6 +8,7 @@ const userSchema = z.object({
         .regex(/[A-Z]/, 'Debe contener al menos una letra mayúscula')
         .regex(/[a-z]/, 'Debe contener al menos una letra minuscula'),
     role: z.enum(['user', 'admin']).default('user'),
+    profiles: z.array(z.any()).default([])
 })
 
 export const validateUser = (object) => {

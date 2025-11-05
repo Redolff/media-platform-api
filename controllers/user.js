@@ -1,4 +1,3 @@
-import { validateMyList } from "../schemas/myList.js"
 import { validatePartialUser, validateUser } from "../schemas/users.js"
 
 export class UserController {
@@ -57,25 +56,6 @@ export class UserController {
             return res.status(404).json({ message: 'User not found' })
         }
         return res.status(200).json({ message: 'User deleted' })
-    }
-
-    addToMyList = async (req, res) => {
-        const { id } = req.params
-        const result = validateMyList(req.body)
-
-        if (!result.success) {
-            return res.status(400).json({ errors: result.error.issues })
-        }
-
-        const { profileId, category, item } = result.data
-
-        try {
-            const addItem = await this.userModel.addToMyList({ id, profileId, category, item })
-            return res.status(201).json(addItem)
-        } catch (error) {
-            console.error(error)
-            return res.status(400).json({ message: error.message })
-        }
     }
 
 }

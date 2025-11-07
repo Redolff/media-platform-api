@@ -7,6 +7,7 @@ export const authRouter = () => {
     AuthRouter.post('/login', AuthController.login)
     AuthRouter.post('/loginGoogle', AuthController.loginGoogle)
     AuthRouter.post('/register', AuthController.register)
+    AuthRouter.post('/refresh', AuthController.refresh)
     AuthRouter.post('/logout', AuthController.logout)
 
     return AuthRouter
